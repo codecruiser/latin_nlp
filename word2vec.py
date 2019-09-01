@@ -1,3 +1,5 @@
+import pickle
+
 import gensim
 import logging
 
@@ -16,6 +18,15 @@ class W2V:
             if line_preprocessed:
                 self.preprocessed.append(line_preprocessed)
 
+    def save_model(self):
+        with open("w2v_model", "wb") as fh:
+            fh.write(pickle.dump(self.model))
+
+    def load_model(self):
+        with open("w2v_model", "rb") as fh:
+            self.model = pickle.load(fh.read())
+
+
     def train(self):
         """
         Trains gathered word lists with W2V model
@@ -25,21 +36,27 @@ class W2V:
         self.logger.info("starts training session... ")
         print("Starts training..")
 
-        self.model = gensim.models.Word2Vec(
-            self.preprocessed,
-            size=150,
-            window=10,
-            min_count=2,
-            workers=10,
-            iter=10
-        )
+        self.load_model()
+
+        if not self.model:
+            self.model = gensim.models.Word2Vec(
+                self.preprocessed,
+                size=150,
+                window=10,
+                min_count=2,
+                workers=10,
+                iter=10
+            )
+
+            self.save_model()
         print("Ends training..")
 
     def find_similar(self, word):
 
         self.logger.info("finds word... ")
 
-        self.model.wv.most_similar(positive=word)
+        similar = self.model.wv.most_similar(positive=word)
+        print(similar)
 
     def _read_file(self):
         """
