@@ -23,8 +23,11 @@ class W2V:
             fh.write(pickle.dump(self.model))
 
     def load_model(self):
-        with open("w2v_model", "rb") as fh:
-            self.model = pickle.load(fh.read())
+        try:
+            with open("w2v_model", "rb") as fh:
+                self.model = pickle.load(fh.read())
+        except FileNotFoundError:
+            self.logger.info("no pickled file")
 
 
     def train(self):
@@ -72,4 +75,4 @@ class W2V:
 w2v = W2V()
 w2v.load()
 w2v.train()
-w2v.find_similar('hortus')
+w2v.find_similar('mort')
