@@ -20,15 +20,11 @@ class W2V:
 
     def save_model(self):
         with open("w2v_model", "wb") as fh:
-            fh.write(pickle.dump(self.model))
+            pickle.dump(self.model, fh)
 
     def load_model(self):
-        try:
-            with open("w2v_model", "rb") as fh:
-                self.model = pickle.load(fh.read())
-        except FileNotFoundError:
-            self.logger.info("no pickled file")
-
+        with open("w2v_model", "rb") as fh:
+            self.model = pickle.load(fh)
 
     def train(self):
         """
@@ -39,7 +35,10 @@ class W2V:
         self.logger.info("starts training session... ")
         print("Starts training..")
 
-        self.load_model()
+        try:
+            self.load_model()
+        except EOFError:
+            pass
 
         if not self.model:
             self.model = gensim.models.Word2Vec(
@@ -75,4 +74,4 @@ class W2V:
 w2v = W2V()
 w2v.load()
 w2v.train()
-w2v.find_similar('mort')
+w2v.find_similar('lux')
